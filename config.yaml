@@ -1,2 +1,20 @@
 THREADS: 12
+
+# genome expects gz file
 GENOMEFTP: ftp://ftp.ensembl.org/pub/release-90/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa.gz
+
+# key file path params to glob sample names, MUST BE ALTERED
+sample_tail: "_S22_L001_R1_001.fastq.gz"
+sample_path: "data/{sample}_S22_L001_R1_001.fastq.gz"
+pat_r1: "{sample}_S22_L001_R1_001.fastq.gz"
+pat_r2: "{sample}_S22_L001_R2_001.fastq.gz"
+
+# QC via bbduk
+minlen: 50
+qtrim: 'rl'
+trimq: 10
+ktrim: 'r'
+kwin: 21
+mink: 11
+hdist: 1
+adaptors: contams_forward_rev.fa
