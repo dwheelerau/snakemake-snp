@@ -1,2 +1,4 @@
 data/*
 *.fastq.gz
+logs/*
+genome/*
