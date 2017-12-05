@@ -2,4 +2,4 @@ data/*
 *.fastq.gz
 logs/*
 genome/*
-./snakemake/*
+.snakemake/
