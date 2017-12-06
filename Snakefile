@@ -25,7 +25,8 @@ rule all:
         "genome/genome.fa",
         "genome/genome.1.bt2",
         expand("data/{sample}{tail}", sample=SAMPLES, tail=SAMPLE_TAIL),
-        expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES)
+        expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
+        expand("bams/{sample}.bam", sample=SAMPLES)
 
 rule clean:
     shell:
@@ -87,3 +88,16 @@ rule sample_qc:
         "minlen={params.minlen} qtrim={params.qtrim} trimq={params.trimq} "
         "ktrim={params.ktrim} k={params.kwin} mink={params.mink} "
         "ref={params.adapt} hdist={params.hdist} 2>&1 | tee -a {log}"
+
+rule bowtie_aln:
+    input:
+        r1 = "clean_reads/{sample}_R1.cln.fastq.gz",
+        r2 = "clean_reads/{sample}_R2.cln.fastq.gz"
+    output:
+        "bams/{sample}.bam"
+    params:
+        thr=THREADS
+        #rg=expand("ID:{sample}\tSM:{sample}", sample=SAMPLES)
+    shell:
+        "bowtie2 --rg 'ID:{wildcards.sample}\tSM:{wildcards.sample}' -p {params.thr} -x genome/genome "
+        "-1 {input.r1} -2 {input.r2} | samtools view -bS - > {output}"
