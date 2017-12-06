@@ -26,7 +26,8 @@ rule all:
         "genome/genome.1.bt2",
         expand("logs/{sample}.aln_report.txt", sample=SAMPLES),
         expand("bams/{sample}.sorted.md.bam", sample=SAMPLES),
-        expand("vcf/{sample}.vcf", sample=SAMPLES)
+        expand("vcf/{sample}.vcf.gz.tbi", sample=SAMPLES),
+        "vcf/merged.vcf.gz"
         #expand("bams/{sample}.sorted.bam", sample=SAMPLES),
         #"logs/qc_report.txt",
         #expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
@@ -38,7 +39,7 @@ rule clean:
         """
         rm -f genome/genome.*
         rm -f logs/*
-        rm -f bams/*bam
+        rm -f bams/*
         rm -f clean_reads/*gz
         rm -f vcf/*
         """
@@ -165,3 +166,27 @@ rule call_snp:
         ploidy=config['ploidy']
     shell:
         "freebayes -f genome/genome.fa -b {input} -p {params.ploidy} > {output}"
+
+rule compress_vcf:
+    input:
+        "vcf/{sample}.vcf"
+    output:
+        "vcf/{sample}.vcf.gz"
+    shell:
+        "bgzip {input}"
+
+rule index_vcf:
+    input:
+        "vcf/{sample}.vcf.gz"
+    output:
+        "vcf/{sample}.vcf.gz.tbi"
+    shell:
+        "tabix -p vcf {input}"
+
+rule merge_vcf:
+    input:
+        expand("vcf/{sample}.vcf.gz.tbi", sample=SAMPLES)
+    output:
+        "vcf/merged.vcf.gz"
+    shell:
+        "vcf-merge vcf/*gz > {output}"
