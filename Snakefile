@@ -12,7 +12,7 @@ THREADS = config['THREADS']
 GENOMEFTP = config['GENOMEFTP']
 
 # other params
-DIRS = ['bams', 'genome', 'logs', 'clean_reads']
+DIRS = ['bams', 'genome', 'logs', 'clean_reads', 'vcf']
 SAMPLE_PATH = config['sample_path']
 SAMPLE_TAIL = config['sample_tail']
 SAMPLES, = glob_wildcards(SAMPLE_PATH)
@@ -24,9 +24,11 @@ rule all:
         DIRS,
         "genome/genome.fa",
         "genome/genome.1.bt2",
-        expand("bams/{sample}.sorted.bam", sample=SAMPLES),
-        "logs/qc_report.txt",
-        expand("logs/{sample}.aln_report.txt", sample=SAMPLES)
+        expand("logs/{sample}.aln_report.txt", sample=SAMPLES),
+        expand("bams/{sample}.sorted.md.bam", sample=SAMPLES),
+        expand("vcf/{sample}.vcf", sample=SAMPLES)
+        #expand("bams/{sample}.sorted.bam", sample=SAMPLES),
+        #"logs/qc_report.txt",
         #expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
         #expand("data/{sample}{tail}", sample=SAMPLES, tail=SAMPLE_TAIL),
         #expand("bams/{sample}.bam", sample=SAMPLES),
@@ -38,6 +40,7 @@ rule clean:
         rm -f logs/*
         rm -f bams/*bam
         rm -f clean_reads/*gz
+        rm -f vcf/*
         """
 
 rule setup:
@@ -71,7 +74,7 @@ rule genome_index:
 rule sample_qc:
     input:
         r1 = join("data", PATTERN_R1),
-        r2 = join("data", PATTERN_R2)
+        r2 = join("data", PATTERN_R2),
     params:
         minlen=config['minlen'],
         qtrim=config['qtrim'],
@@ -92,11 +95,13 @@ rule sample_qc:
         "ktrim={params.ktrim} k={params.kwin} mink={params.mink} "
         "ref={params.adapt} hdist={params.hdist} 2>&1 | tee -a {log}"
 
-rule qc_report:
-    output:
-        "logs/qc_report.txt"
-    shell:
-        "python scripts/report_qc.py logs/read_qc.log | tee {output}"
+#rule qc_report:
+#    input:
+#        "clean_reads/{sample}_R2.cln.fastq.gz"
+#    output:
+#        "logs/qc_report.txt"
+#    shell:
+#        "python scripts/report_qc.py logs/read_qc.log | tee {output}"
 
 rule bowtie_aln:
     input:
@@ -130,10 +135,33 @@ rule aln_report:
     input:
         "bams/{sample}.sorted.bam"
     output:
-        "logs/{sample}.aln_report.txt"
+        aln="logs/{sample}.aln_report.txt",
     shell:
         """
-        samtools flagstat {input} > {output}
-        echo alignment report for sample {output}
-        grep 'mapped' {output}
+        samtools flagstat {input} > {output.aln}
+        echo alignment report for sample {output.aln}
+        grep 'mapped' {output.aln}
+        python scripts/report_qc.py logs/read_qc.log | tee logs/qc_report.txt
         """
+
+rule mark_duplicates:
+    input:
+        "bams/{sample}.sorted.bam"
+    output:
+        bam="bams/{sample}.sorted.md.bam",
+        info="bams/{sample}.markduplicates.txt"
+    log:
+        "logs/markduplicates.log"
+    shell:
+        "picard MarkDuplicates I={input} "
+        "O={output.bam} M={output.info} VALIDATION_STRINGENCY=LENIENT 2> {log}"
+
+rule call_snp:
+    input:
+        "bams/{sample}.sorted.md.bam"
+    output:
+        "vcf/{sample}.vcf"
+    params:
+        ploidy=config['ploidy']
+    shell:
+        "freebayes -f genome/genome.fa -b {input} -p {params.ploidy} > {output}"

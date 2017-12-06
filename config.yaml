@@ -27,3 +27,6 @@ adaptors: contams_forward_rev.fa
 alnmode: "--end-to-end"
 mates: "--fr"
 sensitivity: "--very-sensitive"
+
+## SNP calling
+ploidy: 2

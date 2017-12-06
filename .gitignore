@@ -4,3 +4,4 @@ logs/*
 genome/*
 .snakemake/
 bams/*
+vcf/*
