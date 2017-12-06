@@ -83,7 +83,7 @@ rule sample_qc:
         adapt=config['adaptors']
     output:
         r1_out = "clean_reads/{sample}_R1.cln.fastq.gz",
-        r2_out = "clean_reads/{sample}_R2.cln.fastq.gz"
+        r2_out = "clean_reads/{sample}_R2.cln.fastq.gz",
     log:
         "logs/read_qc.log"
     shell:
@@ -93,12 +93,10 @@ rule sample_qc:
         "ref={params.adapt} hdist={params.hdist} 2>&1 | tee -a {log}"
 
 rule qc_report:
-    input:
-        "logs/read_qc.log"
     output:
         "logs/qc_report.txt"
     shell:
-        "python scripts/report_qc.py {input} | tee {output}"
+        "python scripts/report_qc.py logs/read_qc.log | tee {output}"
 
 rule bowtie_aln:
     input:
@@ -107,12 +105,16 @@ rule bowtie_aln:
     output:
         "bams/{sample}.bam"
     params:
-        thr=THREADS
+        thr=THREADS,
+        mates=config['mates'],
+        mode=config['alnmode'],
+        sensitivity=config['sensitivity']
     log:
         "logs/mapping.log"
     shell:
         "bowtie2 --rg 'ID:{wildcards.sample}\tSM:{wildcards.sample}' "
-        "-p {params.thr} -x genome/genome --met-file {log} "
+        "-p {params.thr} -x genome/genome --met-file {log} {params.mode} "
+        "{params.mates} {params.sensitivity} "
         "-1 {input.r1} -2 {input.r2} | samtools view -bS - > {output}"
 
 rule sort_bam:
