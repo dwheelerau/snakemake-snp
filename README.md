@@ -4,7 +4,7 @@
 sudo apt-get install vcftools  
 
 ## clone workflow into working directory
-git clone https://github.com/dwheelerau/snakemake-snp
+git clone https://github.com/dwheelerau/snakemake-snp  
 cd snakemake-snp
 
 ## edit config and workflow as needed
