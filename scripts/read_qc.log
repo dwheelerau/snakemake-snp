@@ -1,0 +1,49 @@
+/bin/bash: bbduk.sh: command not found
+java -Djava.library.path=/home/dwheeler/.conda/envs/snp/opt/bbmap-37.66/jni/ -ea -Xmx29964m -Xms29964m -cp /home/dwheeler/.conda/envs/snp/opt/bbmap-37.66/current/ jgi.BBDukF in1=data/file-1_S22_L001_R1_001.fastq.gz in2=data/file-1_S22_L001_R2_001.fastq.gz out1=clean_reads/file-1_R1.cln.fastq.gz out2=clean_reads/file-1_R2.cln.fastq.gz minlen=50 qtrim=rl trimq=10 ktrim=r k=21 mink=11 ref=contams_forward_rev.fa hdist=1
+Executing jgi.BBDukF [in1=data/file-1_S22_L001_R1_001.fastq.gz, in2=data/file-1_S22_L001_R2_001.fastq.gz, out1=clean_reads/file-1_R1.cln.fastq.gz, out2=clean_reads/file-1_R2.cln.fastq.gz, minlen=50, qtrim=rl, trimq=10, ktrim=r, k=21, mink=11, ref=contams_forward_rev.fa, hdist=1]
+
+BBDuk version 37.66
+maskMiddle was disabled because useShortKmers=true
+Initial:
+Memory: max=30110m, free=29324m, used=786m
+
+Added 117634 kmers; time: 	0.133 seconds.
+Memory: max=30110m, free=27596m, used=2514m
+
+Input is being processed as paired
+Started output streams:	0.071 seconds.
+Processing time:   		13.079 seconds.
+
+Input:                  	3543972 reads 		357941172 bases.
+QTrimmed:               	573712 reads (16.19%) 	16856032 bases (4.71%)
+KTrimmed:               	269386 reads (7.60%) 	5298393 bases (1.48%)
+Total Removed:          	120740 reads (3.41%) 	22154425 bases (6.19%)
+Result:                 	3423232 reads (96.59%) 	335786747 bases (93.81%)
+
+Time:   			13.301 seconds.
+Reads Processed:       3543k 	266.45k reads/sec
+Bases Processed:        357m 	26.91m bases/sec
+java -Djava.library.path=/home/dwheeler/.conda/envs/snp/opt/bbmap-37.66/jni/ -ea -Xmx29995m -Xms29995m -cp /home/dwheeler/.conda/envs/snp/opt/bbmap-37.66/current/ jgi.BBDukF in1=data/file-2_S22_L001_R1_001.fastq.gz in2=data/file-2_S22_L001_R2_001.fastq.gz out1=clean_reads/file-2_R1.cln.fastq.gz out2=clean_reads/file-2_R2.cln.fastq.gz minlen=50 qtrim=rl trimq=10 ktrim=r k=21 mink=11 ref=contams_forward_rev.fa hdist=1
+Executing jgi.BBDukF [in1=data/file-2_S22_L001_R1_001.fastq.gz, in2=data/file-2_S22_L001_R2_001.fastq.gz, out1=clean_reads/file-2_R1.cln.fastq.gz, out2=clean_reads/file-2_R2.cln.fastq.gz, minlen=50, qtrim=rl, trimq=10, ktrim=r, k=21, mink=11, ref=contams_forward_rev.fa, hdist=1]
+
+BBDuk version 37.66
+maskMiddle was disabled because useShortKmers=true
+Initial:
+Memory: max=30142m, free=29199m, used=943m
+
+Added 117634 kmers; time: 	0.157 seconds.
+Memory: max=30142m, free=27783m, used=2359m
+
+Input is being processed as paired
+Started output streams:	0.080 seconds.
+Processing time:   		13.308 seconds.
+
+Input:                  	3543972 reads 		357941172 bases.
+QTrimmed:               	424724 reads (11.98%) 	14666473 bases (4.10%)
+KTrimmed:               	275942 reads (7.79%) 	5474013 bases (1.53%)
+Total Removed:          	112322 reads (3.17%) 	20140486 bases (5.63%)
+Result:                 	3431650 reads (96.83%) 	337800686 bases (94.37%)
+
+Time:   			13.563 seconds.
+Reads Processed:       3543k 	261.30k reads/sec
+Bases Processed:        357m 	26.39m bases/sec

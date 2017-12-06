@@ -26,7 +26,10 @@ rule all:
         "genome/genome.1.bt2",
         expand("data/{sample}{tail}", sample=SAMPLES, tail=SAMPLE_TAIL),
         expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
-        expand("bams/{sample}.bam", sample=SAMPLES)
+        expand("bams/{sample}.bam", sample=SAMPLES),
+        expand("bams/{sample}.sorted.bam", sample=SAMPLES),
+        "logs/qc_report.txt",
+        expand("logs/{sample}.aln_report.txt", sample=SAMPLES)
 
 rule clean:
     shell:
@@ -89,6 +92,14 @@ rule sample_qc:
         "ktrim={params.ktrim} k={params.kwin} mink={params.mink} "
         "ref={params.adapt} hdist={params.hdist} 2>&1 | tee -a {log}"
 
+rule qc_report:
+    input:
+        "logs/read_qc.log"
+    output:
+        "logs/qc_report.txt"
+    shell:
+        "python scripts/report_qc.py {input} | tee {output}"
+
 rule bowtie_aln:
     input:
         r1 = "clean_reads/{sample}_R1.cln.fastq.gz",
@@ -97,7 +108,29 @@ rule bowtie_aln:
         "bams/{sample}.bam"
     params:
         thr=THREADS
-        #rg=expand("ID:{sample}\tSM:{sample}", sample=SAMPLES)
+    log:
+        "logs/mapping.log"
     shell:
-        "bowtie2 --rg 'ID:{wildcards.sample}\tSM:{wildcards.sample}' -p {params.thr} -x genome/genome "
+        "bowtie2 --rg 'ID:{wildcards.sample}\tSM:{wildcards.sample}' "
+        "-p {params.thr} -x genome/genome --met-file {log} "
         "-1 {input.r1} -2 {input.r2} | samtools view -bS - > {output}"
+
+rule sort_bam:
+    input:
+        "bams/{sample}.bam"
+    output:
+        "bams/{sample}.sorted.bam"
+    shell:
+        "samtools sort -o {output} {input}"
+
+rule aln_report:
+    input:
+        "bams/{sample}.sorted.bam"
+    output:
+        "logs/{sample}.aln_report.txt"
+    shell:
+        """
+        samtools flagstat {input} > {output}
+        echo alignment report for sample {output}
+        grep 'mapped' {output}
+        """
