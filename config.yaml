@@ -1,4 +1,4 @@
-THREADS: 24
+THREADS: 12
 
 ## genome expects gz file
 GENOMEFTP: ftp://ftp.ensembl.org/pub/release-90/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa.gz

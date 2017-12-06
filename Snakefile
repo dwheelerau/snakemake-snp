@@ -24,12 +24,12 @@ rule all:
         DIRS,
         "genome/genome.fa",
         "genome/genome.1.bt2",
-        expand("data/{sample}{tail}", sample=SAMPLES, tail=SAMPLE_TAIL),
-        expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
-        expand("bams/{sample}.bam", sample=SAMPLES),
         expand("bams/{sample}.sorted.bam", sample=SAMPLES),
         "logs/qc_report.txt",
         expand("logs/{sample}.aln_report.txt", sample=SAMPLES)
+        #expand("clean_reads/{sample}_R1.cln.fastq.gz", sample=SAMPLES),
+        #expand("data/{sample}{tail}", sample=SAMPLES, tail=SAMPLE_TAIL),
+        #expand("bams/{sample}.bam", sample=SAMPLES),
 
 rule clean:
     shell:
@@ -101,7 +101,8 @@ rule qc_report:
 rule bowtie_aln:
     input:
         r1 = "clean_reads/{sample}_R1.cln.fastq.gz",
-        r2 = "clean_reads/{sample}_R2.cln.fastq.gz"
+        r2 = "clean_reads/{sample}_R2.cln.fastq.gz",
+        genome="genome/genome.1.bt2",
     output:
         "bams/{sample}.bam"
     params:
